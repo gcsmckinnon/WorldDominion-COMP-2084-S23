@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Available Categories";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <ul>
+        @foreach (var category in Model)
+        {
+            <li><a asp-controller="Categories" asp-action="Browse" asp-route-id="@category.Id">@category.Name</a></li>
+        }
+    </ul>
+</div>
