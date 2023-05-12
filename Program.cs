@@ -42,9 +42,8 @@ namespace WorldDominion
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            RouteConfig.ConfigureRoutes(app);
+
             app.MapRazorPages();
 
             app.Run();
