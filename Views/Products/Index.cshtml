@@ -32,7 +32,7 @@
                 @Html.DisplayNameFor(model => model.Photo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                @Html.DisplayNameFor(model => model.Department)
             </th>
             <th></th>
         </tr>
@@ -56,10 +56,10 @@
                 @Html.DisplayFor(modelItem => item.WeightUnit)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Photo)
+                <partial name="_ProductImage" model="item" />
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
+                @Html.DisplayFor(modelItem => item.Department.Name)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

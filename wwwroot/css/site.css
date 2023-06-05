@@ -16,3 +16,7 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.img-thumbnail {
+    max-width: 100px;
+}

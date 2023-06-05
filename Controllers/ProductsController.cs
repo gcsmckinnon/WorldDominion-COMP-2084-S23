@@ -18,7 +18,7 @@ namespace WorldDominion.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Products.Include(p => p.Category);
+            var applicationDbContext = _context.Products.Include(p => p.Department).OrderBy(p => p.Name);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -31,7 +31,7 @@ namespace WorldDominion.Controllers
             }
 
             var product = await _context.Products
-                .Include(p => p.Category)
+                .Include(p => p.Department)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
@@ -45,13 +45,13 @@ namespace WorldDominion.Controllers
         public IActionResult Create()
         {
             // If there are no categories, we don't want to let the user create a product
-            if (!_context.Categories.Any())
+            if (!_context.Departments.Any())
             {
                 ModelState.AddModelError("", "No categories exist. Please create a category first.");
-                return RedirectToAction("Index", "Categories");
+                return RedirectToAction("Index", "Departments");
             }
             
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name");
             ViewData["WeightUnit"] = new SelectList(Enum.GetValues(typeof(ProductWeightUnit)));
 
             return View();
@@ -62,16 +62,19 @@ namespace WorldDominion.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CategoryId,Name,Description,MSRP,Weight,WeightUnit,Photo")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,DepartmentId,Name,Description,MSRP,Weight,WeightUnit")] Product product, IFormFile? Photo)
         {
             if (ModelState.IsValid)
             {
+                // Check for photo upload and save the file
+                product.Photo = await UploadPhoto(Photo);
+
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", product.DepartmentId);
             ViewData["WeightUnit"] = new SelectList(Enum.GetValues(typeof(ProductWeightUnit)));
 
             return View(product);
@@ -91,7 +94,7 @@ namespace WorldDominion.Controllers
                 return NotFound();
             }
 
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", product.DepartmentId);
             ViewData["WeightUnit"] = new SelectList(Enum.GetValues(typeof(ProductWeightUnit)));
 
             return View(product);
@@ -102,7 +105,7 @@ namespace WorldDominion.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryId,Name,Description,MSRP,Weight,WeightUnit,Photo")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,DepartmentId,Name,Description,MSRP,Weight,WeightUnit")] Product product, IFormFile? Photo)
         {
             if (id != product.Id)
             {
@@ -113,6 +116,8 @@ namespace WorldDominion.Controllers
             {
                 try
                 {
+                    product.Photo = await UploadPhoto(Photo);
+
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
@@ -130,7 +135,7 @@ namespace WorldDominion.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", product.DepartmentId);
             ViewData["WeightUnit"] = new SelectList(Enum.GetValues(typeof(ProductWeightUnit)));
 
             return View(product);
@@ -145,7 +150,7 @@ namespace WorldDominion.Controllers
             }
 
             var product = await _context.Products
-                .Include(p => p.Category)
+                .Include(p => p.Department)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
@@ -177,6 +182,31 @@ namespace WorldDominion.Controllers
         private bool ProductExists(int id)
         {
           return (_context.Products?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        private async Task<string> UploadPhoto(IFormFile Photo)
+        {
+            if (Photo != null)
+            {
+                // Get temp location
+                var filePath = Path.GetTempFileName();
+
+                // Create a unique name so we don't overwrite any existing photos
+                // eg: photo.jpg => abcdefg123456890-photo.jpg (Using the Globally Unique Identifier (GUID))
+                var fileName = Guid.NewGuid() + "-" + Photo.FileName;
+
+                // Set destination path dynamically so it works on any system (double slashes escape the characters)
+                var uploadPath = System.IO.Directory.GetCurrentDirectory() + "\\wwwroot\\img\\products\\" + fileName;
+
+                // Execute the file copy
+                using var stream = new FileStream(uploadPath, FileMode.Create);
+                await Photo.CopyToAsync(stream);
+
+                // Set the Photo property name of the new Product object
+                return fileName;
+            }
+
+            return null;
         }
     }
 }

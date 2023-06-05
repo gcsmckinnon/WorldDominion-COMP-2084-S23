@@ -11,13 +11,13 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                <label asp-for="DepartmentId" class="control-label"></label>
+                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId"></select>
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -41,13 +41,21 @@
             </div>
             <div class="form-group">
                 <label asp-for="WeightUnit" class="control-label"></label>
-                <select asp-for="WeightUnit" class="form-control"></select>
+                <select asp-for="WeightUnit" class="form-control" asp-items="ViewBag.WeightUnit"></select>
                 <span asp-validation-for="WeightUnit" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Photo" class="control-label"></label>
-                <input asp-for="Photo" class="form-control" />
-                <span asp-validation-for="Photo" class="text-danger"></span>
+                <div class="row">
+                    <div class="col-sm-8">
+                        <label asp-for="Photo" class="control-label"></label>
+                        <input type="file" asp-for="Photo" class="form-control" onchange="previewImage(event)" />
+                        <span asp-validation-for="Photo" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <partial name="_ProductImage" model="Model" />
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

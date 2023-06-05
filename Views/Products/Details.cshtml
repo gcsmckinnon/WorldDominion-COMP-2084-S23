@@ -45,13 +45,13 @@
             @Html.DisplayNameFor(model => model.Photo)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Photo)
+            <partial name="_ProductImage" model="Model" />
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
+            @Html.DisplayNameFor(model => model.Department)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.Name)
+            @Html.DisplayFor(model => model.Department.Name)
         </dd>
     </dl>
 </div>
