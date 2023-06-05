@@ -16,8 +16,8 @@ namespace WorldDominion.Models
     {
         public int Id { get; set; }
 
-        [Display(Name="Category")]
-        public int CategoryId { get; set; }
+        [Display(Name="Department")]
+        public int DepartmentId { get; set; }
 
         public string Name { get; set; }
 
@@ -34,6 +34,6 @@ namespace WorldDominion.Models
 
         
         // Associative References (Navigation Properties)
-        public Category? Category { get; set; } // Parent reference
+        public Department? Department { get; set; } // Parent reference
     }
 }
