@@ -5,88 +5,88 @@ using WorldDominion.Models;
 
 namespace WorldDominion.Controllers
 {
-    public class CategoriesController : Controller
+    public class DepartmentsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public CategoriesController(ApplicationDbContext context)
+        public DepartmentsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Categories
+        // GET: Departments
         public async Task<IActionResult> Index()
         {
-              return _context.Categories != null ? 
-                          View(await _context.Categories.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Categories'  is null.");
+              return _context.Departments != null ? 
+                          View(await _context.Departments.ToListAsync()) :
+                          Problem("Entity set 'ApplicationDbContext.Departments'  is null.");
         }
 
-        // GET: Categories/Details/5
+        // GET: Departments/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null || _context.Departments == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var department = await _context.Departments
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (department == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(department);
         }
 
-        // GET: Categories/Create
+        // GET: Departments/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: Departments/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Department department)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(department);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(category);
+            return View(department);
         }
 
-        // GET: Categories/Edit/5
+        // GET: Departments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null || _context.Departments == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var department = await _context.Departments.FindAsync(id);
+            if (department == null)
             {
                 return NotFound();
             }
-            return View(category);
+            return View(department);
         }
 
-        // POST: Categories/Edit/5
+        // POST: Departments/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Department department)
         {
-            if (id != category.Id)
+            if (id != department.Id)
             {
                 return NotFound();
             }
@@ -95,12 +95,12 @@ namespace WorldDominion.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(department);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!DepartmentExists(department.Id))
                     {
                         return NotFound();
                     }
@@ -111,49 +111,49 @@ namespace WorldDominion.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(department);
         }
 
-        // GET: Categories/Delete/5
+        // GET: Departments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null || _context.Departments == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var department = await _context.Departments
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (department == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(department);
         }
 
-        // POST: Categories/Delete/5
+        // POST: Departments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Categories == null)
+            if (_context.Departments == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Categories'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.Departments'  is null.");
             }
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            var department = await _context.Departments.FindAsync(id);
+            if (department != null)
             {
-                _context.Categories.Remove(category);
+                _context.Departments.Remove(department);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool DepartmentExists(int id)
         {
-          return (_context.Categories?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Departments?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
