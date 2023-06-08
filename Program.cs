@@ -20,7 +20,12 @@ namespace WorldDominion
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
+
             var app = builder.Build();
+
+            using var scope = app.Services.CreateScope();
+            scope.ServiceProvider.GetService<DbContext>().Database.Migrate();
+            
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
