@@ -3,7 +3,6 @@ using WorldDominion.Models;
 
 namespace WorldDominion.Components.ViewComponents
 {
-    [ViewComponent(Name = "NavigationMenu")]
     public class NavigationMenuViewComponent : ViewComponent
     {
         public IViewComponentResult Invoke()
