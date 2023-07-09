@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WorldDominion.Data;
+using WorldDominion.Models;
 
 namespace WorldDominion
 {
@@ -16,15 +16,12 @@ namespace WorldDominion
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
 
             var app = builder.Build();
-
-            using var scope = app.Services.CreateScope();
-            scope.ServiceProvider.GetService<DbContext>().Database.Migrate();
             
 
             // Configure the HTTP request pipeline.
