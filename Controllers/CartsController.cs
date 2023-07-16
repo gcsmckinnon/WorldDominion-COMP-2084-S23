@@ -36,6 +36,9 @@ namespace WorldDominion.Controllers
             }
 
             var cart = await _context.Carts
+                .Include(cart => cart.User)
+                .Include(cart => cart.CartItems)
+                    .ThenInclude(cartItem => cartItem.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (cart == null)
             {
