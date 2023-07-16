@@ -59,8 +59,17 @@
                 @Html.DisplayFor(modelItem => item.Department.Name)
             </td>
             <td>
-                <a asp-action="ProductDetails" asp-route-id="@item.Id">View Product</a> |
-                <a asp-controller="Carts" asp-action="AddToCart" asp-route-id="@item.Id">Add to Cart</a>
+                <form asp-action="AddToCart">
+                    @if(User.Identity.IsAuthenticated)
+                    {
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="quantity" value="1" />
+
+                        <input type="submit" value="AddToCart" class="btn btn-danger" />
+                    }
+
+                    <a asp-action="ProductDetails" asp-route-id="@item.Id">View Product</a>
+                </form>
             </td>
         </tr>
 }

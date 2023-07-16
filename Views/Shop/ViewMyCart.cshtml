@@ -1,0 +1,57 @@
+﻿@model WorldDominion.Models.Cart
+
+@{
+    ViewData["Title"] = "View My Cart";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var total = Model.CartItems.Sum(cartItem => cartItem.Price);
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.UserName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.UserName)
+        </dd>
+        <dd class="col-sm-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (CartItem cartItem in Model.CartItems)
+                    {
+                        var subtotal = cartItem.Quantity * cartItem.Price;
+
+                        <tr>
+                            <td>@cartItem.Product.Name</td>
+                            <td>@cartItem.Quantity</td>
+                            <td>@cartItem.Price</td>
+                            <td>@subtotal</td>
+                        </tr>
+                    }
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="3">Total:</td>
+                        <td>@total</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
