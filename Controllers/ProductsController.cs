@@ -76,6 +76,15 @@ namespace WorldDominion.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // If we got this far, something failed. Log the ModelState errors
+            var errors = ModelState
+                .Where(x => x.Value.Errors.Count > 0)
+                .Select(x => new { x.Key, x.Value.Errors })
+                .ToArray();
+
+            // You can put a breakpoint here to inspect 'errors' in the debugger
+            System.Diagnostics.Debug.WriteLine(errors);
+
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", product.DepartmentId);
             ViewData["WeightUnit"] = new SelectList(Enum.GetValues(typeof(ProductWeightUnit)));
 
@@ -136,6 +145,15 @@ namespace WorldDominion.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            // If we got this far, something failed. Log the ModelState errors
+            var errors = ModelState
+                .Where(x => x.Value.Errors.Count > 0)
+                .Select(x => new { x.Key, x.Value.Errors })
+                .ToArray();
+
+            // You can put a breakpoint here to inspect 'errors' in the debugger
+            System.Diagnostics.Debug.WriteLine(errors);
 
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "Name", product.DepartmentId);
             ViewData["WeightUnit"] = new SelectList(Enum.GetValues(typeof(ProductWeightUnit)));
