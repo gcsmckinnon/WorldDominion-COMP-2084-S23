@@ -12,6 +12,13 @@
                 <ul class="navbar-nav flex-grow-1">
                     @foreach (var menuItem in Model)
                     {
+                        if (menuItem.Authorized.GetValueOrDefault() && !User.Identity.IsAuthenticated) continue;
+
+                        if (User.Identity.IsAuthenticated && menuItem.AllowedRoles != null && menuItem.AllowedRoles.Count > 0)
+                        {
+                            if (menuItem.AllowedRoles.Find(role => User.IsInRole(role)) == null) continue;
+                        }
+
                         if (menuItem.DropdownItems != null && menuItem.DropdownItems.Any())
                         {
                             <li class="nav-item dropdown">
@@ -21,6 +28,15 @@
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     @foreach (var dropdownItem in menuItem.DropdownItems)
                                     {
+                                        if (menuItem.Authorized.GetValueOrDefault() && !User.Identity.IsAuthenticated) 
+                                            continue;
+
+                                        if (User.Identity.IsAuthenticated && menuItem.AllowedRoles != null && menuItem.AllowedRoles.Count > 0)
+                                        {
+                                            if (menuItem.AllowedRoles.Find(role => User.IsInRole(role)) == null) 
+                                                continue;
+                                        }
+
                                         <li><a class="dropdown-item" asp-controller="@dropdownItem.Controller" asp-action="@dropdownItem.Action">@dropdownItem.Label</a></li>
                                     }
                                 </ul>
