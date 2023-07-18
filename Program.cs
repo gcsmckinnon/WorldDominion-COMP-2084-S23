@@ -22,6 +22,17 @@ namespace WorldDominion
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    // Access Google Auth section of appsettings.Development.json (our environment variables)
+                    IConfigurationSection googleAuth = builder.Configuration.GetSection("Authentication:Google");
+
+                    // Read Google API key values from config
+                    options.ClientId = googleAuth["ClientId"];
+                    options.ClientSecret = googleAuth["ClientSecret"];
+                });
+
 
             var app = builder.Build();
             
