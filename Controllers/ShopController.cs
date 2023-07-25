@@ -32,5 +32,14 @@ namespace WorldDominion.Controllers
 
             return View(departmentWithProducts);
         }
+
+        public async Task<IActionResult> ProductDetails(int? id)
+        {
+            var product = await _context.Products
+                .Include(product => product.Department)
+                .FirstOrDefaultAsync(product => product.Id == id);
+            
+            return View(product);
+        }
     }
 }
