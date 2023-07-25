@@ -1,0 +1,69 @@
+﻿@model WorldDominion.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details for " + Model.Cart.User.Email;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var cartItem in Model.Cart.CartItems)
+            {
+                var subtotal = cartItem.Quantity * cartItem.Price;
+
+                <tr>
+                    <td>@cartItem.Product.Name</td>
+                    <td>@cartItem.Quantity</td>
+                    <td>@cartItem.Price</td>
+                    <td>@subtotal</td>
+                </tr>
+            }
+        </tbody>
+
+        <tfoot>
+            @{
+                var total = Model.Cart.CartItems.Sum(cartItem => cartItem.Price * cartItem.Quantity);
+            }
+
+            <tr>
+                <th>Total:</th>
+                <td colspan="3">@total</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div>
+    <form asp-action="GoToPayment">
+        <div class="form-group my-3">
+            <label asp-for="ShippingAddress" class="control-label"></label>
+            <textarea asp-for="ShippingAddress" class="form-control" required ></textarea>
+            <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+        </div>
+
+        <div class="form-group my-3">
+            <label asp-for="PaymentMethod" class="control-label"></label>
+            <select asp-for="PaymentMethod" class="form-control" asp-items="ViewBag.PaymentMethods"></select>
+        </div>
+
+        <div class="form-group my-3">
+            <input type="submit" value="Go to Payment" class="btn btn-success" />
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-action="ViewMyCart">Back to Cart</a>
+</div>

@@ -61,15 +61,15 @@
             <td>
                 @if(User.Identity.IsAuthenticated)
                 {
-                    <form asp-action="AddToCart">
+                    <form class="d-inline" asp-action="AddToCart">
                         <input type="hidden" name="productId" value="@item.Id"/>
                         <input type="hidden" name="quantity" value="1"/>
 
-                        <input type="submit" value="AddToCart" class="btn btn-primary"/>
+                        <input type="submit" value="Quick Add" class="btn btn-primary"/>
                     </form>
                 }
                 
-                <a asp-action="ProductDetails" asp-route-id="@item.Id">View Product</a>
+                <a class="btn btn-secondary" asp-action="ProductDetails" asp-route-id="@item.Id">View Product</a>
             </td>
         </tr>
 }
