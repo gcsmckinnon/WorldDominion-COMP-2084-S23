@@ -35,43 +35,44 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Products) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MSRP)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Weight)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.WeightUnit)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Photo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Department.Name)
-            </td>
-            <td>
-                <form asp-action="AddToCart">
-                    @if(User.Identity.IsAuthenticated)
+        @foreach (var item in Model.Products)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MSRP)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Weight)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WeightUnit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Photo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Department.Name)
+                </td>
+                <td>
+                    @if (User.Identity.IsAuthenticated)
                     {
-                        <input type="hidden" name="productId" value="@Model.Id" />
-                        <input type="hidden" name="quantity" value="1" />
+                        <form class="d-inline" asp-action="AddToCart">
+                            <input type="hidden" name="productId" value="@item.Id" />
+                            <input type="hidden" name="quantity" value="1" />
 
-                        <input type="submit" value="AddToCart" class="btn btn-danger" />
+                            <input type="submit" value="Quick Add" class="btn btn-primary" />
+                        </form>
                     }
 
-                    <a asp-action="ProductDetails" asp-route-id="@item.Id">View Product</a>
-                </form>
-            </td>
-        </tr>
-}
+                    <a class="btn btn-secondary" asp-action="ProductDetails" asp-route-id="@item.Id">View Product</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using WorldDominion.Data;
@@ -44,79 +45,120 @@ namespace WorldDominion.Controllers
             return View(product);
         }
 
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddToCart(int productId, int quantity)
+        {
+            // Get our logged in user
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            // Attempt to get a cart
+            var cart = await _context.Carts
+                .FirstOrDefaultAsync(cart => cart.UserId == userId && cart.Active == true);
+
+            // Check that we have don't have an active cart
+            if (cart == null)
+            {
+                cart = new Models.Cart { UserId = userId };
+                await _context.AddAsync(cart);
+                await _context.SaveChangesAsync();
+            }
+
+            // Find our product
+            var product = await _context.Products
+                .FirstOrDefaultAsync(product => product.Id == productId);
+
+            // GTFO if no product found
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // Create a new cart item
+            var cartItem = new CartItem
+            {
+                Cart = cart,
+                Product = product,
+                Quantity = quantity,
+                Price = (decimal)product.MSRP,
+            };
+
+            // If valid, do all the goodness
+            if (ModelState.IsValid)
+            {
+                await _context.AddAsync(cartItem);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("ViewMyCart");
+            }
+
+            // Otherwise, GTFO
+            return NotFound();
+        }
+
         [Authorize]
         public async Task<IActionResult> ViewMyCart()
         {
-            // Get logged in user
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             var cart = await _context.Carts
                 .Include(cart => cart.User)
                 .Include(cart => cart.CartItems)
-                    .ThenInclude(cartItem => cartItem.Product)
-                .FirstOrDefaultAsync(cart => cart.UserId == userId);
-
-            if (cart == null)
-            {
-                cart = new Cart { UserId = userId };
-                await _context.AddAsync(cart);
-                await _context.SaveChangesAsync();
-            }
+                .ThenInclude(cartItem => cartItem.Product)
+                .FirstOrDefaultAsync(cart => cart.UserId == userId && cart.Active == true);
 
             return View(cart);
         }
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddToCart(int productId, int quantity)
+        public async Task<IActionResult> DeleteCartItem(int cartItemId)
         {
-            // Get logged in user
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             var cart = await _context.Carts
-                .FirstOrDefaultAsync(cart => cart.UserId == userId);
+                .FirstOrDefaultAsync(cart => cart.UserId == userId && cart.Active == true);
 
-            if (cart == null)
+            if (cart == null) return NotFound();
+
+            var cartItem = await _context.CartItems
+                .Include(cartItem => cartItem.Product)
+                .FirstOrDefaultAsync(cartItem => cartItem.Cart == cart && cartItem.Id == cartItemId);
+
+            if (cartItem != null)
             {
-                cart = new Cart { UserId = userId };
-                await _context.AddAsync(cart);
+                _context.CartItems.Remove(cartItem);
                 await _context.SaveChangesAsync();
+
+                return RedirectToAction("ViewMyCart");
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(product => product.Id == productId);
+            return NotFound();
+        }
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+        [Authorize]
+        public async Task<IActionResult> Checkout()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var cartItem = new CartItem
+            var cart = await _context.Carts
+                .Include(cart => cart.User)
+                .Include(cart => cart.CartItems)
+                .ThenInclude(cartItem => cartItem.Product)
+                .FirstOrDefaultAsync(cart => cart.UserId == userId && cart.Active == true);
+
+            var order = new Order
             {
+                UserId = userId,
                 Cart = cart,
-                Product = product,
-                Quantity = 1,
-                Price = (decimal)product.MSRP
+                Total = ((decimal)(cart.CartItems.Sum(cartItem => (cartItem.Price * cartItem.Quantity)))),
+                ShippingAddress = "",
+                PaymentMethod = PaymentMethods.VISA,
             };
 
-            if (ModelState.IsValid)
-            {
-                await _context.AddAsync(cartItem);
-                await _context.SaveChangesAsync();
+            ViewData["PaymentMethods"] = new SelectList(Enum.GetValues(typeof(PaymentMethods)));
 
-                return RedirectToAction(nameof(Index));
-            }
-
-            // If we got this far, something failed. Log the ModelState errors
-            var errors = ModelState
-                .Where(x => x.Value.Errors.Count > 0)
-                .Select(x => new { x.Key, x.Value.Errors })
-                .ToArray();
-
-            // You can put a breakpoint here to inspect 'errors' in the debugger
-            System.Diagnostics.Debug.WriteLine(errors);
-
-            return View(ProductDetails);
+            return View(order);
         }
     }
 }

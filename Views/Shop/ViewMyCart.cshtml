@@ -1,57 +1,71 @@
 ﻿@model WorldDominion.Models.Cart
 
 @{
-    ViewData["Title"] = "View My Cart";
+    if (Model == null || Model.CartItems == null || Model.CartItems.Count == 0)
+    {
+        <div class="alert alert-warning">
+            <p>You must add items to your cart.</p>
+        </div>
+
+        return;
+    }
+}
+
+@{
+    ViewData["Title"] = "Cart Details for " + Model.User.Email;
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var total = Model.CartItems.Sum(cartItem => cartItem.Price);
 }
 
 <h1>@ViewData["Title"]</h1>
 
 <div>
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.User.UserName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.UserName)
-        </dd>
-        <dd class="col-sm-12">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
 
-                <tbody>
-                    @foreach (CartItem cartItem in Model.CartItems)
-                    {
-                        var subtotal = cartItem.Quantity * cartItem.Price;
+        <tbody>
+            @foreach (var cartItem in Model.CartItems)
+            {
+                var subtotal = cartItem.Quantity * cartItem.Price;
 
-                        <tr>
-                            <td>@cartItem.Product.Name</td>
-                            <td>@cartItem.Quantity</td>
-                            <td>@cartItem.Price</td>
-                            <td>@subtotal</td>
-                        </tr>
-                    }
-                </tbody>
+                <tr>
+                    <td>@cartItem.Product.Name</td>
+                    <td>@cartItem.Quantity</td>
+                    <td>@cartItem.Price</td>
+                    <td style="text-align: right">@subtotal</td>
+                    <td>
+                        <form class="d-inline" asp-action="DeleteCartItem">
+                            <input type="hidden" name="cartItemId" value="@cartItem.Id" />
+                            <input class="btn btn-danger" type="submit" value="Remove" />
+                        </form>
 
-                <tfoot>
-                    <tr>
-                        <td colspan="3">Total:</td>
-                        <td>@total</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </dd>
-    </dl>
+                        <a class="btn btn-secondary" asp-action="ProductDetails" asp-route-id="@cartItem.ProductId">View Product</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+        <tfoot>
+            @{
+                var total = Model.CartItems.Sum(cartItem => (decimal)(cartItem.Price * cartItem.Quantity));
+            }
+            <tr>
+                <th>Total:</th>
+                <td colspan="3" style="text-align: right">@total</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
 </div>
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a class="btn btn-success" asp-action="Checkout">Checkout</a>
     <a asp-action="Index">Back to List</a>
 </div>

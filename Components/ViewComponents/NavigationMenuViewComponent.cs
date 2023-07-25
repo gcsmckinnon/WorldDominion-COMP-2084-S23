@@ -12,6 +12,8 @@ namespace WorldDominion.Components.ViewComponents
             new MenuItem { Controller = "Home", Action = "Index", Label = "Home" },
             new MenuItem { Controller = "Shop", Action = "Index", Label = "Shop" },
             new MenuItem { Controller = "Shop", Action = "ViewMyCart", Label = "Cart", Authorized = true },
+            new MenuItem { Controller = "Shop", Action = "Orders", Label = "My Orders", Authorized = true, AllowedRoles = new List<string> { "Customer" }},
+            new MenuItem { Controller = "Orders", Action = "Orders", Label = "My Orders", Authorized = true, AllowedRoles = new List<string> { "Administrator" }},
             new MenuItem { Controller = "Departments", Action = "Index", Label = "Departments", DropdownItems = new List<MenuItem> {
                 new MenuItem { Controller = "Departments", Action = "Index", Label = "List" },
                 new MenuItem { Controller = "Departments", Action = "Create", Label = "Create" },

@@ -1,7 +1,7 @@
 ﻿@model WorldDominion.Models.Product
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Name + " Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -55,16 +55,26 @@
         </dd>
     </dl>
 </div>
+
 <div>
-    <form asp-action="AddToCart">
-        @if(User.Identity.IsAuthenticated)
-        {
+    @if (User.Identity.IsAuthenticated)
+    {
+        <form class="d-inline" asp-action="AddToCart">
             <input type="hidden" name="productId" value="@Model.Id" />
-            <input type="hidden" name="quantity" value="1" />
 
-            <input type="submit" value="AddToCart" class="btn btn-danger" />
-        }
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Quantity</span>
+                </div>
 
-        <a asp-action="Index">Back to Browse Departments</a>
-    </form>
+                <input class="form-control" type="number" name="quantity" min="1" step="1" value="1" />
+
+                <div class="input-group-append">
+                    <input type="submit" value="Add to Cart" class="btn btn-primary" />
+                </div>
+            </div>
+        </form>
+    }
+
+    <a asp-action="Index">Back to List</a>
 </div>
