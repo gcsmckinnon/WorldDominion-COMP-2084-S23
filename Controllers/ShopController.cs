@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using WorldDominion.Data;
@@ -88,11 +89,76 @@ namespace WorldDominion.Controllers
                 await _context.AddAsync(cartItem);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("ProductDetails", new { id = productId });
+                return RedirectToAction("ViewMyCart");
             }
 
             // Otherwise, GTFO
             return NotFound();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ViewMyCart()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var cart = await _context.Carts
+                .Include(cart => cart.User)
+                .Include(cart => cart.CartItems)
+                .ThenInclude(cartItem => cartItem.Product)
+                .FirstOrDefaultAsync(cart => cart.UserId == userId && cart.Active == true);
+
+            return View(cart);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> DeleteCartItem(int cartItemId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var cart = await _context.Carts
+                .FirstOrDefaultAsync(cart => cart.UserId == userId && cart.Active == true);
+
+            if (cart == null) return NotFound();
+
+            var cartItem = await _context.CartItems
+                .Include(cartItem => cartItem.Product)
+                .FirstOrDefaultAsync(cartItem => cartItem.Cart == cart && cartItem.Id == cartItemId);
+
+            if (cartItem != null)
+            {
+                _context.CartItems.Remove(cartItem);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("ViewMyCart");
+            }
+
+            return NotFound();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Checkout()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var cart = await _context.Carts
+                .Include(cart => cart.User)
+                .Include(cart => cart.CartItems)
+                .ThenInclude(cartItem => cartItem.Product)
+                .FirstOrDefaultAsync(cart => cart.UserId == userId && cart.Active == true);
+
+            var order = new Order
+            {
+                UserId = userId,
+                Cart = cart,
+                Total = ((decimal)(cart.CartItems.Sum(cartItem => (cartItem.Price * cartItem.Quantity)))),
+                ShippingAddress = "",
+                PaymentMethod = PaymentMethods.VISA,
+            };
+
+            ViewData["PaymentMethods"] = new SelectList(Enum.GetValues(typeof(PaymentMethods)));
+
+            return View(order);
         }
     }
 }
