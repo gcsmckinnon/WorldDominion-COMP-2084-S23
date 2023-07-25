@@ -35,7 +35,7 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Products) {
+    @foreach (var item in Model.Products) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -59,19 +59,19 @@
                 @Html.DisplayFor(modelItem => item.Department.Name)
             </td>
             <td>
-                <form asp-action="AddToCart">
-                    @if(User.Identity.IsAuthenticated)
-                    {
+                @if(User.Identity.IsAuthenticated)
+                {
+                    <form class="d-inline" asp-action="AddToCart">
                         <input type="hidden" name="productId" value="@item.Id"/>
                         <input type="hidden" name="quantity" value="1"/>
 
-                        <input type="submit" value="AddToCart" class="btn btn-primary"/>
-                    }
-
-                    <a asp-action="ProductDetails" asp-route-id="@item.Id">View Product</a>
-                </form>
+                        <input type="submit" value="Quick Add" class="btn btn-primary"/>
+                    </form>
+                }
+                
+                <a class="btn btn-secondary" asp-action="ProductDetails" asp-route-id="@item.Id">View Product</a>
             </td>
         </tr>
-}
+       }
     </tbody>
 </table>
