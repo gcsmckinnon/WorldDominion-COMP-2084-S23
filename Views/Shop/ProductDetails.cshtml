@@ -56,6 +56,25 @@
     </dl>
 </div>
 <div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <form asp-action="AddToCart">
+            <input type="hidden" name="productId" value="@Model.Id">
+
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Quantity</span>
+                </div>
+
+                <input class="form-control" type="number" name="quantity" value="1">
+
+                <div class="input-group-append">
+                    <input type="submit" value="Quick Add" class="btn btn-primary">
+                </div>
+            </div>
+        </form>
+    }
+
     @{
         var backlink = "Back to " + Model.Department.Name;
     }
