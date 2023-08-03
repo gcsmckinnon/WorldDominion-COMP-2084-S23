@@ -1,52 +1,46 @@
 ﻿@model WorldDominion.Models.Order
 
 @{
-    ViewData["Title"] = "Your Order";
+    ViewData["Title"] = "Completed Order for " + Model.Cart.User.Email;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>@ViewData["Title"]</h1>
 
 <div>
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Total)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Total)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingAddress)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ShippingAddress)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PaymentReceived)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayTextFor(model => model.PaymentReceived)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PaymentMethod)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PaymentMethod)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Cart)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Cart.Id)
-        </dd>
-    </dl>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var cartItem in Model.Cart.CartItems)
+            {
+                var subtotal = cartItem.Quantity * cartItem.Price;
+
+                <tr>
+                    <td>@cartItem.Product.Name</td>
+                    <td>@cartItem.Quantity</td>
+                    <td>@cartItem.Price</td>
+                    <td style="text-align: right">@subtotal</td>
+                </tr>
+            }
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th>Total:</th>
+                <td colspan="3" style="text-align: right">@Model.Total</td>
+            </tr>
+        </tfoot>
+    </table>
 </div>
+
 <div>
-    <a asp-action="Orders">Back to List</a>
+    <a asp-action="Orders">Back to Orders</a>
 </div>

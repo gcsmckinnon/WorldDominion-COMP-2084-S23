@@ -20,6 +20,18 @@ namespace WorldDominion
             builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>() // Enables roles (not on by default)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            // Add dependency so controllers can read config values
+            builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
+            // Add Sessions
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(5);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             builder.Services.AddControllersWithViews();
 
             // Enable Google Auth
@@ -36,6 +48,9 @@ namespace WorldDominion
 
 
             var app = builder.Build();
+
+            // Use the session
+            app.UseSession();
             
 
             // Configure the HTTP request pipeline.

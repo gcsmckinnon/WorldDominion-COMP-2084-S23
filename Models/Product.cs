@@ -23,8 +23,7 @@ namespace WorldDominion.Models
 
         public string? Description { get; set; }
 
-        [MinimumValue(0.01), Required]
-        public double MSRP { get; set; }
+        public decimal MSRP { get; set; }
 
         public decimal Weight { get; set; }
 
